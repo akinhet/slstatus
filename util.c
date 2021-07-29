@@ -144,3 +144,18 @@ pscanf(const char *path, const char *fmt, ...)
 
 	return (n == EOF) ? -1 : n;
 }
+
+/*
+char *
+strcat(const char *s1, const char *s2)
+{
+	const size_t len1 = strlen(s1);
+	const size_t len2 = strlen(s2);
+
+	char *output = malloc(len1 + len2 + 1);
+	memcpy(output, s1, len1);
+	memcpy(output + len1, s2, len2 + 1);
+
+	return output;
+}
+*/

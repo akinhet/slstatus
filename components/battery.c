@@ -8,6 +8,7 @@
 	#include <limits.h>
 	#include <stdint.h>
 	#include <unistd.h>
+	#include <stdlib.h>
 
 	static const char *
 	pick(const char *bat, const char *f1, const char *f2, char *path,
@@ -50,6 +51,9 @@
 			char *state;
 			char *symbol;
 		} map[] = {
+		/*	{ "Charging",    " " },
+			{ "Discharging", ""   },
+			{ "Full",        ""   }, */
 			{ "Charging",    "+" },
 			{ "Discharging", "-" },
 			{ "Full",        "o" },
@@ -116,6 +120,46 @@
 
 		return "";
 	}
+
+	const char *
+	battery_icon(const char *bat)
+	{
+		char output[3];
+		char path[PATH_MAX];
+		int perc, i;
+
+		struct{
+			int value;
+			char *icon;
+		} map[] = {
+			{ 10,  "" },
+			{ 20,  "" },
+			{ 30,  "" },
+			{ 40,  "" },
+			{ 50,  "" },
+			{ 60,  "" },
+			{ 70,  "" },
+			{ 80,  "" },
+			{ 90,  "" },
+			{ 100, "" },
+		};
+
+		if (esnprintf(path, sizeof(path),
+		              "/sys/class/power_supply/%s/capacity", bat) < 0) {
+			return NULL;
+		}
+		if (pscanf(path, "%d", &perc) != 1) {
+			return NULL;
+		}
+
+		for (i=0; i<9 && perc>map[i].value; i++);
+		strcat(output, (strcmp(battery_state(bat), "+") == 0) ? " " : "");
+		
+		strcat(output, map[i].icon);
+
+		return bprintf("%s", output);
+	}
+
 #elif defined(__OpenBSD__)
 	#include <fcntl.h>
 	#include <machine/apmvar.h>
